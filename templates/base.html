@@ -1,0 +1,20 @@
+{% load static%}
+<head>
+    <link rel="stylesheet" type="text/css" href='{% static "bunnySpend5/base.css" %}'/>
+    {% block child_css %}extra css{% endblock %}
+</head>
+
+<div>
+    <nav>
+        <ul>
+            <li><a href="{%url 'bunnySpend5:appIndex' %}">Contents</a></li>
+            <li><a href="{% url 'bunnySpend5:transaction_create' %}">+ New Transaction</a></li>
+        </ul>
+    </nav>
+</div>
+
+<div class="block_content" >
+    {% block content %}
+        Contents 
+    {% endblock %}
+</div>

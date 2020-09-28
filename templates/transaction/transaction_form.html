@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load staticfiles%}
+
+{% block content %}
+
+<h1>Add Transaction</h1>
+    {% if category_type == 0 %}
+        <form action="{% url 'bunnySpend5:transaction_create' %}" method="post">
+    {% else %}
+        <form action="{% url 'bunnySpend5:transaction_income_create' %}" method="POST">
+    {% endif %}
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Save" />
+</form>
+
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+    $(function () {
+        $("#id_description").autocomplete({
+            source: '{% url "bunnySpend5:auto_trans_descr" %}',
+            minLength: 2
+        });
+    });
+</script>
+
+<script>
+    $(function () {
+        $("#id_category").autocomplete({
+            source: '{% url "bunnySpend5:auto_category" category_type %}',
+            minLength: 0
+        });
+    });
+</script>
+
+{% endblock %}

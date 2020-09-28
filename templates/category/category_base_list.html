@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load staticfiles%}
+
+{% block child_css %}
+<link rel="stylesheet" type="text/css" href='{% static "bunnySpend5/style.css" %}'/>
+{% endblock %}
+
+{% block content %}
+<h1>
+    <div class="nav-left">
+     All Categories
+    </div>
+</h1>
+
+<table>
+    <div>
+        <table style="width:100%">
+            <thead>
+            <tr>
+                {% for field in fields %}
+                <th id="th{{forloop.counter}}" style="text-align: center;" >{{ field }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for cat in object_list %}
+            <tr>
+            <td headers="th0" >{{cat.name }}</td>
+            <td headers="th1" >{{cat.accumulative}}</td>
+            <td headers="th2">{{cat.type}} </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</table>
+{% endblock %}

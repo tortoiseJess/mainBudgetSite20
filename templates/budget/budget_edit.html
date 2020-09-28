@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load staticfiles%}
+
+{% block content %}
+
+<h1>Edit Budget Item</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+<input type="submit" value="Update" />
+</form>
+
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+    $(function () {
+        $("#id_category").autocomplete({
+            source: '{% url "bunnySpend5:auto_category" budget_type %}',
+            minLength: 0
+        });
+    });
+</script
+
+{% endblock %}

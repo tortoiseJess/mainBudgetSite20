@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load staticfiles%}
+
+{% block child_css %}
+<link rel="stylesheet" type="text/css" href='{% static "bunnySpend5/style.css" %}'/>
+{% endblock %}
+
+{% block content %}
+<h1>
+    <div>
+     Budget of month: {{start_date}}
+    </div>
+</h1>
+
+<div>
+    <table style="width:80%">
+        <thead>
+        <tr>
+            {% for field in fields %}
+            <th id="th{{forloop.counter}}" style="text-align: center;" >{{ field }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for budget in object_list %}
+        <tr>
+        <td headers="th0" >{{budget.category.name}}</td>
+        <td headers="th1" style="text-align: right;" >{{budget.formated_amount}} </td>
+        <td headers="th2" style="text-align: center;" >{{budget.start_date|date:"SHORT_DATE_FORMAT"}} </td>
+        <td headers="th3" style="text-align: right;">{{budget.freq_month|floatformat:3}} </td>
+        {% if allow_create %}
+            <td><a href="{% url 'bunnySpend5:budget_edit' budget_type budget.pk %}" >edit</a></td>
+            {% if budget_type == 0 %}
+                <td><a href="{% url 'bunnySpend5:budget_delete' budget.pk %}" >remove</a></td> 
+            {% else %}
+                <td><a href="{% url 'bunnySpend5:budget_income_delete' budget.pk %}" >remove</a></td> 
+            {% endif %}
+        {% endif %}
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div>
+    {% if allow_copy %}
+        {% if budget_type == 0 %}
+            <form action="{% url 'bunnySpend5:budget_copy' %}" method="POST">
+        {% else %}
+            <form action="{% url 'bunnySpend5:budget_income_copy' %}" method="POST">
+        {% endif %}
+        {% csrf_token %}
+        <button id="copy button" type="submit">Copy current month budget to next month</button>
+    </form>
+    {% endif %}
+</div>
+
+{% if allow_create %}
+    <div>
+        {% if budget_type == 0 %}
+            <form action="{% url 'bunnySpend5:budget_create' %}" method="POST">
+        {% else %}
+            <form action="{% url 'bunnySpend5:budget_income_create' %}" method="POST">
+        {% endif %}
+        {% csrf_token %}
+            <button id="create button" type="submit">Create new budget item in next month's budget</button>
+        </form>
+    </div>
+
+    <div style="font-size: small;">
+        <h2>Message Info:</h2>
+        {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+{% endif %}
+
+{% endblock %}

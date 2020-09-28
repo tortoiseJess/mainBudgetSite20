@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% load staticfiles%}
+
+{% block content %}
+<h1> <a id="top">Balance of each category/account ytd: </a></h1>
+<style>
+    table, td, tr, th{
+        border-collapse: collapse;
+        border: 1px solid black;
+    }
+
+    body {
+            font-family: "Helvetica Neue", sans-serif;
+            margin: 0 auto;
+            display: table;
+	}
+    .category, .sum_diff {
+			font-size: .7em;
+	}
+</style>
+
+<body>
+<div>
+    <h3><a id="diff"> Running months of deficit/surplus ytd by category</a></h3>
+    {{diff_table | safe}}
+    <p style="font-size: small;">Note 1: each cell = monthly balance - actual transaction of that month</p>
+    <p><a href="#top">top</a></p>
+</div>
+
+<div>
+    <h3><a id="balance"> Balances of each category</a></h3>
+    {{balance_table | safe}}
+    <p style="font-size: small;">Note 1: sum_diff = reserves = sum of each row above + seed</p>
+    <p><a href="#top">top</a></p>
+</div>
+
+
+<h2>Balance Bar Chart</h2>
+<div id="BalanceChart"></div>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script>
+    var data = {{balances_json|safe}};
+    
+    data.sort(function(a,b){return b.sum_diff - a.sum_diff;});
+    console.log(data);
+    // var balancesArray = $.parseJSON(data); //install jquery?
+    //sorting?
+
+    var margin = {top: 10, right: 0, bottom: 0, left: 0},
+        width = 400 - margin.left - margin.right,
+        height = 500 - margin.top - margin.bottom;
+
+    var svg = d3.select("#BalanceChart").append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var x = d3.scaleLinear()
+          .range([0,width]);
+
+    var y = d3.scaleBand()
+          .rangeRound([height,0])
+          .padding(0.2);
+
+    x.domain(d3.extent(data, function(d){ return d.sum_diff; }));
+	y.domain(data.map(function(d) { return d.category; }));
+
+	svg.selectAll(".bar")
+		.data(data)
+		.enter().append("rect")
+		.attr("class", "bar")
+		.attr("x", function(d){ return d.sum_diff < 0 ? x(d.sum_diff) : x(0); })
+					.attr("width", function(d){ return d.sum_diff < 0 ? x(d.sum_diff * -1) - x(0) : x(d.sum_diff) - x(0); })
+		.attr("y", function(d){ return y(d.category); })
+					.attr("height", y.bandwidth())
+					.attr("fill", function(d){ return d.sum_diff < 0 ? "#d7191c": "#1a9641"; });
+    //format numeral values
+	svg.selectAll(".sum_diff")
+		.data(data)
+		.enter().append("text")
+		.attr("class", "diff")
+		.attr("x", function(d){
+				if (d.sum_diff < 0){
+					return (x(d.sum_diff * -1) - x(0)) > 20 ? x(d.sum_diff) + 2 : x(d.sum_diff) - 1;
+				} else {
+					return (x(d.sum_diff) - x(0)) > 20 ? x(d.sum_diff) - 2 : x(d.sum_diff) + 1;
+				}
+			})
+		.attr("y", function(d){ return y(d.category); })
+		.attr("dy", y.bandwidth() - 2.55)
+		.attr("text-anchor", function(d){
+				if (d.sum_diff < 0){
+					return (x(d.sum_diff * -1) - x(0)) > 20 ? "start" : "end";
+				} else {
+					return (x(d.sum_diff) - x(0)) > 20 ? "end" : "start";
+				}
+			})
+		.style("fill", function(d){
+				if (d.sum_diff < 0){
+					return (x(d.sum_diff * -1) - x(0)) > 20 ? "#fff" : "#3a403d";
+				} else {
+					return (x(d.sum_diff) - x(0)) > 20 ? "#fff" : "#3a403d";
+				}
+			})
+        .text(function(d){ return d.sum_diff; });
+            
+    //format category values
+	svg.selectAll(".category")
+		.data(data)
+		.enter().append("text")
+			.attr("class", "key")
+			.attr("x", function(d){ return d.sum_diff < 0 ? x(0) + 2.55 : x(0) - 2.55 })
+			.attr("y", function(d){ return y(d.category); })
+			.attr("dy", y.bandwidth() - 2.55)
+			.attr("text-anchor", function(d){ return d.sum_diff < 0 ? "start" : "end"; })
+			.text(function(d){ return d.category; });
+
+	svg.append("line")
+			.attr("x1", x(0))
+			.attr("x2", x(0))
+			.attr("y1", 0 + margin.top)
+			.attr("y2", height - margin.top)
+			.attr("stroke", "#3a403d")
+			.attr("stroke-width", "1px");
+
+</script>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+<div class="container">
+    <h2>House Supply Balance/Diff Line Chart</h2>
+    <canvas id="bunny_lineChart"></canvas>
+</div>
+<script>
+    var ctx = document.getElementById('bunny_lineChart').getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: {{table_labels|safe}},
+                    datasets: [{
+                        data: {{houseSupply_diff_datas|safe}},
+                        backgroundColor: Chart.helpers.color,
+                        fill: false,
+                    }]
+                },
+                options: {
+                    title: {
+                        display: true,
+                        text: 'House Supply running diff',                       
+                    },
+                    legend: {
+                        disblay: true,
+                        position: 'right',
+                        labels: {
+                            fontColor: '#000'
+                        }
+                    }
+                }
+            }
+        );
+ </script>
+
+</body>
+{% endblock %}

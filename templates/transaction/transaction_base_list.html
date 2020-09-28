@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load staticfiles%}
+
+{% block child_css %}
+<link rel="stylesheet" type="text/css" href='{% static "bunnySpend5/style.css" %}'/>
+{% endblock %}
+
+{% block content %}
+<h1>
+    <div class="nav-left">
+     Transaction Records
+    </div>
+</h1>
+
+<div>
+    <table style="width:100%">
+        <thead>
+        <tr>
+            {% for field in fields %}
+            <th id="th{{forloop.counter}}" style="text-align: center;" >{{ field }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for transaction in object_list %}
+        <tr>
+        <td headers="th0" >{{transaction.transaction_date|date:"D d M Y" }}</td>
+        <td headers="th1" >{{transaction.category.name}}</td>
+        <td headers="th2" style="text-align: right;" >{{transaction.formated_amount}} </td>
+        <td headers="th3" >{{transaction.description}} </td>
+        <td headers="th4" style="text-align: right;">{{transaction.am_months|floatformat:1}} </td>
+        <td><a href="{%url 'bunnySpend5:transaction_edit' transaction.pk %}">edit</a></td>
+        <td><a href="{%url 'bunnySpend5:transaction_delete' transaction.pk %}">delete</a></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<h3>
+<div class="page">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+</h3>
+
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load staticfiles%}
+
+{% block content %}
+    {% if category_type == 0 %}
+        <form method="get" action="{% url 'bunnySpend5:transaction_stat' 0 %}">
+    {% else %}
+        <form method="get" action="{% url 'bunnySpend5:transaction_stat' 1 %}">
+    {% endif %}
+    {% csrf_token %}
+    <ol>
+    <li>
+        <label for="start_month_choice">Select start month:</label>
+        <input type="month" id="start_month_choice" name="start_month_choice"
+           min="2018-05" value="2018-05">
+    </li>
+    <li>
+        <label for="end_month_choice">Select end month:</label>
+        <input type="month" id="end_month_choice" name="end_month_choice"
+            min="2018-05" value="2018-05">
+    </li>
+    <li>
+        <label >Select Category:</label>
+        <select name="category">
+            {% for cat in category_all %}
+                <option value={{cat}}>{{cat}}</option>
+            {% endfor %}
+        </select>
+    </li>
+    </ol>
+    <input type="submit" value="Go">
+    
+</form>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load staticfiles%}
+
+{% block child_css %}
+<link rel="stylesheet" type="text/css" href='{% static "bunnySpend5/style.css" %}'/>
+{% endblock %}
+
+{% block content %}
+<h1>
+    <div>
+     Transaction Spending by month:
+    </div>
+</h1>
+
+<div>
+    <table style="width:80%">
+        <thead>
+            <tr>
+                {% for field in fields %}
+                <th id="th{{forloop.counter}}" style="text-align: center;" >{{ field }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+        {% for transaction in object_list %}
+        {% if transaction.checked is False %}
+            <tr style="background-color:lightcoral">
+        {% else %}
+            <tr>
+        {% endif %}
+            <td headers="th0" >{{transaction.transaction_date|date:" d-m-Y" }}</td>
+            <td  headers="th1">{{transaction.category.name}}</td>
+            <td headers="th2" style="text-align: right;" >{{transaction.formated_amount}} </td>
+            <td headers="th3" >{{transaction.description}} </td>
+            <td headers="th4" style="text-align: right;">{{transaction.am_months|floatformat:1}} </td>
+            <td><a href="{%url 'bunnySpend5:transaction_edit' transaction.pk %}">edit</a></td>
+            <td><a href="{%url 'bunnySpend5:transaction_delete' transaction.pk %}">delete</a></td>
+            </tr>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
