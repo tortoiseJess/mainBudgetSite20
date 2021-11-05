@@ -3,6 +3,7 @@
  A budget app that tracks spending + plans budget.
  - Added amortization calculations.
  - Uses Django framework, postgres 
+ - Learn more in my blog post here: https://www.rickyjessey.com/2021/09/app-development-post-1.html
 
  Main files:
  -----------
